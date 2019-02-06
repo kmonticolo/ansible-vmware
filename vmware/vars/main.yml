@@ -1,0 +1,12 @@
+---
+# vars file for vmware
+vcenter_host: vcenterwaw.schange.com
+vcenter_username: kamil.monticolo@schange.com
+vcenter_password: "{{ vmwarepassword }}"
+vcenter_datacenter: WAW1
+v_username: administrator
+v_password: Cdci2018
+vmstate: poweredon
+parent_folder: advertising
+project: test_auto3
+jiraticket: SPT-4133

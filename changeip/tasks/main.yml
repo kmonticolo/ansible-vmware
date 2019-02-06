@@ -1,0 +1,35 @@
+---
+# tasks file for changeip
+- name: copy ipconfigure.sh scripts
+  copy:
+    src: files/ipconfigure.sh
+    dest: /root
+    mode: 0750
+
+- name: change ip
+  command: /root/ipconfigure.sh
+  register: newip
+
+- debug:
+    var: newip.stdout
+
+- set_fact:
+    hostname: "{{ inventory_hostname }}"
+    ip: "{{ newip.stdout }}"
+  delegate_to: localhost
+#
+# - name: restart network service
+#   service:
+#     name: network
+#     state: restarted
+#
+# reboot instead of restart service
+- name: Reboot immediately if there was a change.
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  #when: task_result is changed
+
+- name: wait for new IP to be assigned
+  pause:
+    seconds: 40

@@ -1,0 +1,93 @@
+---
+- name: vmware
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vmware/vars/main.yml
+  roles:
+    - { role: vmware, tags: vmware }
+  tasks:
+  - pause:
+      seconds: 20
+
+- name: set keys on Linuxes
+  hosts: cim, pump, vtsi
+  gather_facts: false
+  tasks:
+
+- name: ssh keys
+  hosts: localhost
+  vars:
+    - linux_password: generic
+  gather_facts: false
+  tasks:
+
+  - name: run ssh-copy-id
+    command: sshpass -p "{{ linux_password }}" /usr/bin/ssh-copy-id root@"{{ item }}"
+    loop:
+      - 10.48.77.241
+      - 10.48.77.242
+      - 10.48.77.243
+
+- name: Change IP on Linuxes
+  hosts: cim, pump, vtsi
+  serial: 1
+  gather_facts: True
+  roles:
+    - { role: changeip, tags: changeip }
+
+
+# {{ hostvars['asdf.example.com']['ansible_facts']['os_family'] }}
+
+- name: get vars
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: run ssh-copy-id
+    command: echo {{ hostvars['cim']['ansible_facts']['newip.stdout'] }}
+
+    loop:
+      - 10.48.77.241
+      - 10.48.77.242
+      - 10.48.77.243
+
+
+#
+# - name: mvl
+#   hosts: mvl
+#   gather_facts: false
+#   vars_files:
+#     - vars/windows.yml
+#
+#   roles:
+#     - { role: users, tags: users }
+#     - { role: mvl, tags: mvl }
+#     - { role: ntp, tags: ntp }
+#     - { role: populate_hosts, tags: populate_hosts }
+#       #- { role: reboot, tags: reboot }
+#
+# - name: tss
+#   hosts: tss
+#   gather_facts: false
+#   vars_files:
+#     - vars/windows.yml
+#
+#   roles:
+#     - { role: users, tags: users }
+#     - { role: tss, tags: tss }
+#     - { role: ntp, tags: ntp }
+#     - { role: populate_hosts, tags: populate_hosts }
+#       #- { role: reboot, tags: reboot }
+#
+# - name: tsi
+#   hosts: tsi
+#   gather_facts: false
+#   vars_files:
+#     - vars/windows.yml
+#
+#   roles:
+#     - { role: users, tags: users }
+#     - { role: ntp, tags: ntp }
+#     - { role: populate_hosts, tags: populate_hosts }
+#     - { role: reboot, tags: reboot }
