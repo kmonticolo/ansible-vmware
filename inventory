@@ -1,0 +1,6 @@
+---
+[local]
+localhost ansible_connection=local
+
+[static]
+10.48.77.240

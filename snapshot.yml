@@ -1,0 +1,12 @@
+---
+- name: Gather snapshot facts about the virtual machine in the given vCenter
+  hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: snapshot facts
+    vmware_guest_snapshot_facts:
+      hostname: "vcenterwaw.schange.com"
+      username: "kamil.monticolo@schange.com"
+      password: "{{ vmwarepassword }}"
+      validate_certs: no
+      datacenter: "WAW1"

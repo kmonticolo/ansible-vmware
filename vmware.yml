@@ -1,0 +1,82 @@
+---
+- name: create project folder in advertising
+  hosts: localhost
+  vars:
+    - vcenter_host: vcenterwaw.schange.com
+    - vcenter_username: kamil.monticolo@schange.com
+    - vcenter_password: "{{ vmwarepassword }}"
+    - vcenter_datacenter: WAW1
+    - v_username: administrator
+    - v_password: Cdci2018
+    - vmstate: poweredon
+    - parent_folder: advertising
+    - project: test_auto3
+    - jiraticket: SPT-4133
+
+  gather_facts: no
+  tasks:
+  - name: create folder
+    vcenter_folder:
+      hostname: "{{ vcenter_host }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: False
+      datacenter: "{{ vcenter_datacenter }}"
+      folder_name: "{{ project }}"
+      parent_folder: "{{ parent_folder }}"
+      folder_type: vm
+      state: present
+    delegate_to: localhost
+
+  - name: Create VMs from a template
+    vmware_guest:
+      hostname: "{{ vcenter_host }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      annotation: "{{ jiraticket }} {{ project }}"
+      validate_certs: False
+      folder: "{{ parent_folder }}/{{ project }}"
+      name: "{{ item }}01_{{ project }}"
+      template: "{{ item }}_tmpl"
+      datacenter: "{{ vcenter_datacenter }}"
+      state: "{{ vmstate }}"
+      esxi_hostname: 10.192.192.232
+    delegate_to: localhost
+    register: deploy_vm
+    loop:
+      - CIM
+      - PUMP
+      - VTSI
+      - MDB
+
+# sprawdz wolne ip dla windows
+
+  - name: Wait for VMware tools to become available
+    vmware_guest_tools_wait:
+      hostname: "{{ vcenter_host }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: False
+      name: "{{ item }}01_{{ project }}"
+      folder: "/{{ vcenter_datacenter }}/{{ parent_folder }}/{{ project }}"
+    loop:
+      - MDB
+
+  - name: Change IP Address for Windows MDB Machine
+    vmware_vm_shell:
+      hostname: "{{ vcenter_host }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: False
+      datacenter: "{{ vcenter_datacenter }}"
+      folder: "/{{ vcenter_datacenter }}/{{ parent_folder }}/{{ project }}"
+      vm_id: "{{ item }}01_{{ project }}"
+      vm_username: "{{ v_username }}"
+      vm_password: "{{ v_password }}"
+      vm_shell: netsh.exe
+      vm_shell_args: 'interface ip set address name="SPOT" static 10.48.77.16 255.255.255.0 10.48.77.1'
+      vm_shell_cwd: "C:\\Windows\\System32"
+    loop:
+      - MDB
+
+# https://stackoverflow.com/questions/51769902/ansible-vmware-windows-server/51775197#51775197
