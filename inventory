@@ -4,21 +4,26 @@ localhost ansible_connection=local
 
 [mdb]
 10.48.77.240
+[mdb:vars]
+inventory_hostname_short=mdb
 
 [cim]
 10.48.77.241
 [cim:vars]
+inventory_hostname_short=cim
 ansible_ssh_user=root
 ansible_ssh_password=generic
 
 [pump]
 10.48.77.242
 [pump:vars]
+inventory_hostname_short=pump
 ansible_ssh_user=root
 ansible_ssh_password=generic
 
 [vtsi]
 10.48.77.243
 [vtsi:vars]
+inventory_hostname_short=vtsi
 ansible_ssh_user=root
 ansible_ssh_password=generic
