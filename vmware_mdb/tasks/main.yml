@@ -1,0 +1,40 @@
+---
+# tasks file for /home/kamil/ansible-vmware/vmware_mdb
+- name: debug
+  debug:
+
+    msg: "{{ hostvars[groups['cim'][0]]['ip_for_mdb']['stdout'] }}"
+
+- name: set IP for MDB
+  set_fact:
+    mdb_ip: "{{ hostvars[groups['cim'][0]]['ip_for_mdb']['stdout'] }}"
+
+- name: Wait for VMware tools to become available
+  vmware_guest_tools_wait:
+    hostname: "{{ vcenter_host }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: False
+    name: "{{ item }}01_{{ project }}"
+    folder: "/{{ vcenter_datacenter }}/{{ parent_folder }}/{{ project }}"
+  loop:
+    - MDB
+
+- name: Change IP Address for Windows MDB Machine
+  vmware_vm_shell:
+    hostname: "{{ vcenter_host }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: False
+    datacenter: "{{ vcenter_datacenter }}"
+    folder: "/{{ vcenter_datacenter }}/{{ parent_folder }}/{{ project }}"
+    vm_id: "{{ item }}01_{{ project }}"
+    vm_username: "{{ v_username }}"
+    vm_password: "{{ v_password }}"
+    vm_shell: netsh.exe
+    vm_shell_args: 'interface ip set address name="SPOT" static "{{ mdb_ip }}" 255.255.255.0 10.48.77.1'
+    vm_shell_cwd: "C:\\Windows\\System32"
+  loop:
+    - MDB
+
+# https://stackoverflow.com/questions/51769902/ansible-vmware-windows-server/51775197#51775197
