@@ -32,62 +32,20 @@
 - name: Change IP on Linuxes
   hosts: cim, pump, vtsi
   serial: 1
-  gather_facts: True
+  gather_facts: false
   roles:
     - { role: changeip, tags: changeip }
 
-
-# {{ hostvars['asdf.example.com']['ansible_facts']['os_family'] }}
-
-- name: get vars
+- name: create inventory
   hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - debug:
+        msg: "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
+
+- hosts: temp_group
   gather_facts: false
   tasks:
-
-  - name: run ssh-copy-id
-    command: echo {{ hostvars['cim']['ansible_facts']['newip.stdout'] }}
-
-    loop:
-      - 10.48.77.241
-      - 10.48.77.242
-      - 10.48.77.243
-
-
-#
-# - name: mvl
-#   hosts: mvl
-#   gather_facts: false
-#   vars_files:
-#     - vars/windows.yml
-#
-#   roles:
-#     - { role: users, tags: users }
-#     - { role: mvl, tags: mvl }
-#     - { role: ntp, tags: ntp }
-#     - { role: populate_hosts, tags: populate_hosts }
-#       #- { role: reboot, tags: reboot }
-#
-# - name: tss
-#   hosts: tss
-#   gather_facts: false
-#   vars_files:
-#     - vars/windows.yml
-#
-#   roles:
-#     - { role: users, tags: users }
-#     - { role: tss, tags: tss }
-#     - { role: ntp, tags: ntp }
-#     - { role: populate_hosts, tags: populate_hosts }
-#       #- { role: reboot, tags: reboot }
-#
-# - name: tsi
-#   hosts: tsi
-#   gather_facts: false
-#   vars_files:
-#     - vars/windows.yml
-#
-#   roles:
-#     - { role: users, tags: users }
-#     - { role: ntp, tags: ntp }
-#     - { role: populate_hosts, tags: populate_hosts }
-#     - { role: reboot, tags: reboot }
+    - debug:
+        msg: "{{ groups['temp_group'] }}"
