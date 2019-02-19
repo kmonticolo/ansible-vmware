@@ -1,14 +1,19 @@
 ---
-- name: vmware
+- name: Clone site on VNware
   hosts: localhost
   gather_facts: false
   vars_files:
     - vmware/vars/main.yml
   roles:
-    - { role: vmware, tags: vmware }
+    - { role: vmware, tags: create }
   tasks:
-  - pause:
-      seconds: 20
+  - name: Wait for SSH to come up
+    wait_for: host="{{ item }}" port=22 delay=5 timeout=30 state=started
+    delegate_to: localhost
+    loop:
+      - 10.48.77.241
+      - 10.48.77.242
+      - 10.48.77.243
 
 - name: set keys on Linuxes
   hosts: cim, pump, vtsi
@@ -28,6 +33,23 @@
       - 10.48.77.241
       - 10.48.77.242
       - 10.48.77.243
+
+- name: Get IP for Windows MDB
+  hosts: cim
+  gather_facts: false
+  tasks:
+    - name: Get IP for MDB
+      command: /root/ipconfigure.sh check
+      register: ip_for_mdb
+      run_once: true
+
+- name: VMware for MDB
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vmware/vars/main.yml
+  roles:
+    - { role: vmware_mdb, tags: mdb }
 
 - name: Change IP on Linuxes
   hosts: cim, pump, vtsi
