@@ -10,26 +10,17 @@
   command: /root/ipconfigure.sh
   register: newip
 
-- debug:
-    var: newip.stdout
-
 - set_fact:
-    hostname: "{{ inventory_hostname }}"
     ip: "{{ newip.stdout }}"
-  delegate_to: localhost
-#
-# - name: restart network service
-#   service:
-#     name: network
-#     state: restarted
-#
-# reboot instead of restart service
+
+- debug:
+    msg: "{{ ip }}"
+
 - name: Reboot immediately if there was a change.
   shell: "sleep 5 && reboot"
   async: 1
   poll: 0
-  #when: task_result is changed
 
-- name: wait for new IP to be assigned
-  pause:
-    seconds: 40
+- name: Wait for SSH to come up
+  wait_for: host="{{ ip }}" port=22 delay=20 timeout=320 state=started
+  delegate_to: localhost
