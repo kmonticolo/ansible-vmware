@@ -1,12 +1,15 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Role clones VM and assign IPs.
+- 3x CentOS 7 (CIM, PUMP, vTSI)
+- 1x Win2k16 (MDB)
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Same as for Ansible "vmware_guest" module.
+Access with proper rights to vcenter_host
 
 Role Variables
 --------------
@@ -21,11 +24,9 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+cd /home/kamil/ansible-vmware
+ansible-playbook -i inventory site.yml -e "vmwarepassword=<password> vmstate=poweredon project=test_auto6"
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
 
 License
 -------
@@ -35,4 +36,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Kamil Monticolo
