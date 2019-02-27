@@ -28,7 +28,7 @@
   tasks:
 
   - name: run ssh-copy-id
-    command: sshpass -p "{{ linux_password }}" /usr/bin/ssh-copy-id root@"{{ item }}"
+    command: sshpass -p "{{ linux_password }}" /usr/bin/ssh-copy-id -i ~/.ssh/id_rsa.pub root@"{{ item }}"
     loop:
       - 10.48.77.241
       - 10.48.77.242
