@@ -4,6 +4,7 @@ vcenter_host: vcenterwaw.schange.com
 vcenter_username: kamil.monticolo@schange.com
 vcenter_password: "{{ vmwarepassword }}"
 vcenter_datacenter: WAW1
+esxi: 10.192.192.232
 v_username: administrator
 v_password: Cdci2018
 vmstate: poweredon

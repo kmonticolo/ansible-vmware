@@ -26,7 +26,7 @@
     template: "{{ item }}_tmpl"
     datacenter: "{{ vcenter_datacenter }}"
     state: "{{ vmstate }}"
-    esxi_hostname: 10.192.192.232
+    esxi_hostname: "{{ esxi }}"
   delegate_to: localhost
   tags: create
   register: deploy_vm
