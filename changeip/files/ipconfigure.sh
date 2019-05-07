@@ -10,8 +10,9 @@ grep -q "release 7" /etc/centos-release && MAC=$(ifconfig $IFACE |grep ether | a
 
 
 [[ $(grep -q $MAC /etc/sysconfig/network-scripts/ifcfg-$IFACE) ]] || sed -i "s/^HWADDR=.*/HWADDR=$MAC/" /etc/sysconfig/network-scripts/ifcfg-$IFACE
-
-flag=0 ; for i in `seq 31 250`;do arping -w2 -c1 -I $IFACE "$NETWORK".$i >/dev/null || flag=$?; if [ "$flag" -eq "1" ]; then export IP="$NETWORK".$i; echo $IP; break;fi ;done
+START=$(ip route get 1 | awk '{print $NF;exit}'|sed 's/^.*\.//')
+START=$(($START + 1))
+flag=0 ; for i in `seq $START 250`;do arping -w2 -c1 -I $IFACE "$NETWORK".$i >/dev/null || flag=$?; if [ "$flag" -eq "1" ]; then export IP="$NETWORK".$i; echo $IP; break;fi ;done
 
 [[ "$1" == "check" ]] && exit 0
 [[ $IP ]] && sed -i "s/^IPADDR=.*/IPADDR=\"$IP\"/" /etc/sysconfig/network-scripts/ifcfg-$IFACE
