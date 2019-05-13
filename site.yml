@@ -27,8 +27,15 @@
   gather_facts: false
   tasks:
 
-  - name: run ssh-copy-id
-    command: sshpass -p "{{ linux_password }}" /usr/bin/ssh-copy-id -i ~/.ssh/id_rsa.pub root@"{{ item }}"
+  - name: Remove old SSH keys
+    command: ssh-keygen -f "/home/kamil/.ssh/known_hosts" -R "{{ item }}"
+    loop:
+      - 10.48.77.241
+      - 10.48.77.242
+      - 10.48.77.243
+
+  - name: Run ssh-copy-id
+    command: sshpass -p "{{ linux_password }}" /usr/bin/ssh-copy-id -oStrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub root@"{{ item }}"
     loop:
       - 10.48.77.241
       - 10.48.77.242
